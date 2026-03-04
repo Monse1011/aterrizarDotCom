@@ -29,7 +29,7 @@ class CachingAviatorClientProxyTest {
     void shouldReturnCachedFlightWithoutCallingRealClient() throws Exception {
         var realClient = mock(AviatorV2HttpClient.class);
         var redisTemplate = mock(StringRedisTemplate.class);
-        @SuppressWarnings("unchecked")
+
         var valueOperations = mock(ValueOperations.class);
         var objectMapper = new ObjectMapper();
 
@@ -59,12 +59,12 @@ class CachingAviatorClientProxyTest {
         when(valueOperations.get(anyString()))
                 .thenAnswer(invocation -> cache.get(invocation.getArgument(0, String.class)));
         doAnswer(
-                        invocation -> {
-                            cache.put(
-                                    invocation.getArgument(0, String.class),
-                                    invocation.getArgument(1, String.class));
-                            return null;
-                        })
+                invocation -> {
+                    cache.put(
+                            invocation.getArgument(0, String.class),
+                            invocation.getArgument(1, String.class));
+                    return null;
+                })
                 .when(valueOperations)
                 .set(anyString(), anyString(), eq(Duration.ofMinutes(10)));
 
@@ -80,7 +80,8 @@ class CachingAviatorClientProxyTest {
 
         long firstStartNanos = System.nanoTime();
         var firstCall = proxy.getFlights("USJFKGBLHR");
-        long firstElapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - firstStartNanos);
+        long firstElapsedMillis =
+                TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - firstStartNanos);
 
         proxy.getFlights("USJFKGBLHR");
         long secondStartNanos = System.nanoTime();
@@ -98,9 +99,6 @@ class CachingAviatorClientProxyTest {
 
     private FlightDto buildFlight(String flightNumber) {
         return new FlightDto(
-                flightNumber,
-                "12345",
-                new AirportDto("JFK", "US"),
-                new AirportDto("LHR", "GB"));
+                flightNumber, "12345", new AirportDto("JFK", "US"), new AirportDto("LHR", "GB"));
     }
 }
