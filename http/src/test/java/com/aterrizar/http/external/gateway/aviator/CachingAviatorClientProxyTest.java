@@ -29,7 +29,7 @@ class CachingAviatorClientProxyTest {
     void shouldReturnCachedFlightWithoutCallingRealClient() throws Exception {
         var realClient = mock(AviatorV2HttpClient.class);
         var redisTemplate = mock(StringRedisTemplate.class);
-
+        @SuppressWarnings("unchecked")
         var valueOperations = mock(ValueOperations.class);
         var objectMapper = new ObjectMapper();
 
@@ -59,12 +59,12 @@ class CachingAviatorClientProxyTest {
         when(valueOperations.get(anyString()))
                 .thenAnswer(invocation -> cache.get(invocation.getArgument(0, String.class)));
         doAnswer(
-                invocation -> {
-                    cache.put(
-                            invocation.getArgument(0, String.class),
-                            invocation.getArgument(1, String.class));
-                    return null;
-                })
+                        invocation -> {
+                            cache.put(
+                                    invocation.getArgument(0, String.class),
+                                    invocation.getArgument(1, String.class));
+                            return null;
+                        })
                 .when(valueOperations)
                 .set(anyString(), anyString(), eq(Duration.ofMinutes(10)));
 
